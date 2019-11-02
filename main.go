@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 const (
@@ -14,42 +16,41 @@ const (
 )
 
 func main() {
-	bot()
+	/**/
+	count := "3"
+	offset := "1"
+
+	u := url.Values{}
+	u.Set("v", version)
+	u.Set("count", count)
+	u.Set("offset", offset)
+	u.Set("owner_id", groupID)
+	u.Set("access_token", ServiceKey)
+	u.Set("extended", "1") // is it important?
+
+	url := fmt.Sprintf("https://api.vk.com/method/%v?", method)
+	path := url + u.Encode()
+	/**/
+	bot(path)
 	/*
-		count := "3"
-		offset := "1"
+		body, err := getPosts(path)
+		if err != nil {
+			log.Fatal(err)
+		}
 
+		if len(body.Groups) != 1 {
+			log.Fatal(errors.New("empty info about group"))
+		}
 
-
-			u := url.Values{}
-			u.Set("v", version)
-			u.Set("count", count)
-			u.Set("offset", offset)
-			u.Set("owner_id", groupID)
-			u.Set("access_token", ServiceKey)
-			u.Set("extended", "1") // is it important?
-
-			url := fmt.Sprintf("https://api.vk.com/method/%v?", method)
-			path := url + u.Encode()
-
-			body, err := getPosts(path)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			if len(body.Groups) != 1 {
-				log.Fatal(errors.New("empty info about group"))
-			}
-
-			for _, v := range body.Items {
-				log.Println(time.Time(v.Date))
-				log.Println(v.Text)
-				fmt.Println()
-				id := strconv.Itoa(v.ID)
-				link := makeLink(id)
-				log.Println(link)
-				fmt.Println()
-			}
+		for _, v := range body.Items {
+			log.Println(time.Time(v.Date))
+			log.Println(v.Text)
+			fmt.Println()
+			id := strconv.Itoa(v.ID)
+			link := makeLink(id)
+			log.Println(link)
+			fmt.Println()
+		}
 	*/
 }
 
