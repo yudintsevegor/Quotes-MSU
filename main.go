@@ -1,16 +1,32 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 
-	//	sendler "github.com/yudintsevegor/dotfiles/go_projects/src/tgBotVkPostsSendler"
-	sendler "github.com/yudintsevegor/tgBotVkPostsSendler"
+	_ "github.com/lib/pq"
+
+	sendler "github.com/yudintsevegor/dotfiles/go_projects/src/tgBotVkPostsSendler"
+	// sendler "github.com/yudintsevegor/tgBotVkPostsSendler"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 func main() {
+
+	db, err := sql.Open("postgres", DSN)
+	if err != nil {
+		log.Fatal("OPEN ERROR: ", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatal("PING ERROR: ", err)
+	}
+
+	// testing
+	return
+
 	port := "8080"
 	go http.ListenAndServe(":"+port, nil)
 	fmt.Printf("start listen :%v\n", port)
