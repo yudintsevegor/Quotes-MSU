@@ -3,6 +3,7 @@ A little project, which implementes a telegram bot for sending posts from vk com
 
 ## Packages 
 * [tgBotVkPostsSendler](https://github.com/yudintsevegor/tgBotVkPostsSendler)
+*[PostgreSQL](github.com/lib/pq)
 
 ## Using the application with web-connection
 [Link to telegram-channel](https://t.me/quotesMSU).
