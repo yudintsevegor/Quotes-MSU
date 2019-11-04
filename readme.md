@@ -2,8 +2,8 @@
 A little project, which implementes a telegram bot for sending posts from vk community to telegram channel.
 
 ## Packages 
-* [tgBotVkPostsSendler](https://github.com/yudintsevegor/tgBotVkPostsSendler)
-*[PostgreSQL](github.com/lib/pq)
+* [tgBoVkPostsSendler](https://github.com/yudintsevegor/tgBotVkPostsSendler)
+* [PostgreSQL](https://github.com/lib/pq)
 
 ## Using the application with web-connection
 [Link to telegram-channel](https://t.me/quotesMSU).
