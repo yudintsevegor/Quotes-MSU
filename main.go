@@ -14,18 +14,28 @@ import (
 )
 
 func main() {
-
 	db, err := sql.Open("postgres", DSN)
 	if err != nil {
 		log.Fatal("OPEN ERROR: ", err)
 	}
+	defer db.Close()
 
 	if err := db.Ping(); err != nil {
 		log.Fatal("PING ERROR: ", err)
 	}
 
-	// testing
-	return
+	w := sendler.Writer{
+		DB: db,
+	}
+
+	tableName := "quotesMSU"
+	if _, err = w.EditTable(sendler.CreateTable, tableName); err != nil {
+		log.Fatal("EDITION ERROR: ", err)
+	}
+
+	if err = w.WriteToDB(tableName); err != nil {
+		log.Fatal("WRITING ERROR: ", err)
+	}
 
 	port := "8080"
 	go http.ListenAndServe(":"+port, nil)
