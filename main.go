@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	_ "github.com/lib/pq"
 
@@ -25,17 +26,15 @@ func main() {
 	}
 
 	w := sendler.Writer{
-		DB: db,
+		DB:        db,
+		TableName: "quotesMSU",
 	}
 
-	tableName := "quotesMSU"
-	if _, err = w.EditTable(sendler.CreateTable, tableName); err != nil {
-		log.Fatal("EDITION ERROR: ", err)
+	/**/
+	if _, err = w.EditTable(sendler.CreateTable); err != nil {
+		log.Fatal("EDITION DB ERROR: ", err)
 	}
-
-	if err = w.WriteToDB(tableName); err != nil {
-		log.Fatal("WRITING ERROR: ", err)
-	}
+	/**/
 
 	port := "8080"
 	go http.ListenAndServe(":"+port, nil)
@@ -48,10 +47,10 @@ func main() {
 
 	groupID := "-65652356" // https://vk.com/ustami_msu
 	channelName := "@DebuggingMSUBot"
-	webHookURL := "https://cfb24135.ngrok.io"
+	webHookURL := "https://9a37a229.ngrok.io"
 
 	opt := sendler.ReqOptions{
-		Count:  "5",
+		Count:  "10",
 		Offset: "0",
 		Filter: "owner",
 	}
@@ -61,6 +60,9 @@ func main() {
 		WebHookURL:  webHookURL,
 		Options:     opt,
 		ErrChan:     make(chan error),
+
+		TimeOut: time.Hour * 24,
+		Writer:  &w,
 	}
 
 	go caller.CallBot(bot, caller.GetVkPosts(groupID, ServiceKey))
