@@ -14,6 +14,16 @@ import (
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
+const (
+	isExist = `
+	SELECT EXISTS (
+		SELECT 1
+		FROM   information_schema.tables 
+		WHERE  table_schema = 'public'
+		AND    table_name = 'quotesmsu'
+		);`
+)
+
 func main() {
 	db, err := sql.Open("postgres", DSN)
 	if err != nil {
@@ -30,10 +40,18 @@ func main() {
 		TableName: "quotesMSU",
 	}
 
+	var ok bool
+	row := w.DB.QueryRow(isExist)
+	row.Scan(&ok)
+	log.Println(ok)
+
 	/**/
-	if _, err = w.EditTable(sendler.CreateTable); err != nil {
-		log.Fatal("EDITION DB ERROR: ", err)
+	if !ok{
+		if _, err = w.EditTable(sendler.CreateTable); err != nil {
+			log.Fatal("EDITION DB ERROR: ", err)
+		}
 	}
+	
 	/**/
 
 	port := "8080"
