@@ -14,16 +14,6 @@ import (
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
-const (
-	isExist = `
-	SELECT EXISTS (
-		SELECT 1
-		FROM   information_schema.tables 
-		WHERE  table_schema = 'public'
-		AND    table_name = 'quotesmsu'
-		);`
-)
-
 func main() {
 	db, err := sql.Open("postgres", DSN)
 	if err != nil {
@@ -40,19 +30,9 @@ func main() {
 		TableName: "quotesMSU",
 	}
 
-	var ok bool
-	row := w.DB.QueryRow(isExist)
-	row.Scan(&ok)
-	log.Println(ok)
-
-	/**/
-	if !ok{
-		if _, err = w.EditTable(sendler.CreateTable); err != nil {
-			log.Fatal("EDITION DB ERROR: ", err)
-		}
+	if _, err = w.CreateTable(); err != nil {
+		log.Fatal("EDITION DB ERROR: ", err)
 	}
-	
-	/**/
 
 	port := "8080"
 	go http.ListenAndServe(":"+port, nil)
@@ -65,7 +45,7 @@ func main() {
 
 	groupID := "-65652356" // https://vk.com/ustami_msu
 	channelName := "@DebuggingMSUBot"
-	webHookURL := "https://9a37a229.ngrok.io"
+	webHookURL := "https://2cb4fcf3.ngrok.io"
 
 	opt := sendler.ReqOptions{
 		Count:  "10",
