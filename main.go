@@ -8,44 +8,43 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-
 	sendler "github.com/yudintsevegor/dotfiles/go_projects/src/tgBotVkPostsSendler"
 	// sendler "github.com/yudintsevegor/tgBotVkPostsSendler"
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 func main() {
 	db, err := sql.Open("postgres", DSN)
 	if err != nil {
-		log.Fatal("OPEN ERROR: ", err)
+		log.Fatal("DataBase Open error: ", err)
 	}
 	defer db.Close()
 
 	if err := db.Ping(); err != nil {
-		log.Fatal("PING ERROR: ", err)
+		log.Fatal("DataBase Ping Error: ", err)
 	}
 
-	w := sendler.Writer{
+	w := sendler.DbWriter{
 		DB:        db,
-		TableName: "quotesMSU",
+		TableName: "quotesmsu",
 	}
 
 	if _, err = w.CreateTable(); err != nil {
-		log.Fatal("EDITION DB ERROR: ", err)
+		log.Fatal("Createtable Error: ", err)
 	}
 
 	port := "8080"
 	go http.ListenAndServe(":"+port, nil)
 	fmt.Printf("start listen :%v\n", port)
 
-	bot, err := tgbotapi.NewBotAPI(BotToken)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	groupID := "-65652356" // https://vk.com/ustami_msu
 	channelName := "@DebuggingMSUBot"
-	webHookURL := "https://2cb4fcf3.ngrok.io"
+	webHookURL := "https://ecd153a5.ngrok.io"
+
+	telegram := sendler.Telegram{
+		ChannelName: channelName,
+		WebHookURL:  webHookURL,
+		BotToken:    BotToken,
+	}
 
 	opt := sendler.ReqOptions{
 		Count:  "10",
@@ -53,19 +52,21 @@ func main() {
 		Filter: "owner",
 	}
 
-	caller := sendler.Caller{
-		ChannelName: channelName,
-		WebHookURL:  webHookURL,
-		Options:     opt,
-		ErrChan:     make(chan error),
+	handler := sendler.Handler{
+		Telegram: telegram,
+		Options:  opt,
+		ErrChan:  make(chan error),
 
-		TimeOut: time.Hour * 24,
-		Writer:  &w,
+		TimeOut:  time.Hour * 24,
+		DbWriter: &w,
 	}
 
-	go caller.CallBot(bot, caller.GetVkPosts(groupID, ServiceKey))
+	recipients := []string{"georgesyndicart"}
+	handler.GetRecipients(recipients)
 
-	for err := range caller.ErrChan {
+	go handler.StartBot(handler.GetVkPosts(groupID, VkServiceKey))
+
+	for err := range handler.ErrChan {
 		log.Fatal(err)
 	}
 }
